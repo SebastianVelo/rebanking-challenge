@@ -3,6 +3,7 @@ package com.ecommerce.rebanking.challenge.models.services;
 import java.io.IOException;
 import java.util.List;
 
+import org.apache.logging.log4j.core.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,12 +22,7 @@ public class PhoneServiceImpl implements IPhoneService {
 
 	@Autowired
 	private IPhoneDao phoneDao;
-	
-	@Override
-	@Transactional
-	public Phone save(Phone phone) {
-		return phoneDao.save(phone);
-	}
+	private Logger logger;
 
 	@Override
 	@Transactional
@@ -35,28 +31,37 @@ public class PhoneServiceImpl implements IPhoneService {
 	}
 	
 	@Override
+	@Transactional
+	public Phone save(Phone phone) {
+		return phoneDao.save(phone);
+	}
+	
+	@Override
 	@Transactional(readOnly = true)
 	public List<Phone> findAll() {
-		return (List<Phone>) phoneDao.findAll();
+		List<Phone> phones = phoneDao.findAll();
+		logger.info("Response PhoneDao findAll" + phones);
+		return phones;
 	}
 
 	@Override
 	@Transactional(readOnly = true)
 	public Phone findById(Long id) {
-		return phoneDao.findById(id).get();
+		Phone phone = phoneDao.findById(id).get();
+		logger.info("Response PhoneDao findById" + phone);
+		return phone;
 	}
 
 	@Override
 	@Transactional
-	public Phone findByDevice(String device) throws Exception {
+	public Phone findByDevice(String device) {
 		Phone phone = phoneDao.findByDevice(device);
+		logger.info("Response PhoneDao findByDevice" + phone);
 		if(phone == null) {
 			phone = findByDeviceInAPI(device);
 			if(phone != null) {
-				save(phone);
-			}
-			else {
-				throw new Exception("Modelo de celular no encontrado. Asegurate de haberlo escrito correctamente.");
+				phone = save(phone);
+				logger.info("Response PhoneDao save" + phone);
 			}
 		}
 		return phone;
@@ -71,25 +76,32 @@ public class PhoneServiceImpl implements IPhoneService {
 			.addHeader("x-rapidapi-host", "phonelabo.p.rapidapi.com")
 			.addHeader("x-rapidapi-key", "ac3728f626msh31e17f63df5fb32p1fc418jsn1d8addc86709")
 			.build();
+		logger.info("Request getdevice: " + request);
 		try {
 			Response response = client.newCall(request).execute();
+			logger.info("Response getdevice: " + response);
 			if(response.code() == 200) {
 				ResponseBody responseBody = response.body();
 				phone = requestToPhone(responseBody);
 			}			
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		}
 				
 		return phone;
 	}
 	
-	private Phone requestToPhone(ResponseBody responseBody) throws JsonSyntaxException, IOException {
+	private Phone requestToPhone(ResponseBody responseBody) {
 		Gson gson = new Gson(); 
-		Phone phone = gson.fromJson(responseBody.string(), Phone.class);
+		Phone phone = null;
+		try {
+			phone = gson.fromJson(responseBody.string(), Phone.class);
+			logger.info("JSON parseado correctamente: " + responseBody.string());
+		} catch (JsonSyntaxException e) {
+			logger.error(e.getMessage());
+		} catch (IOException e) {
+			logger.error(e.getMessage());
+		}
 		return phone;
 	}
-	
-	
-
 }

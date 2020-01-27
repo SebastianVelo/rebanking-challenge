@@ -10,6 +10,6 @@ public interface IPhoneService {
 	public void delete(Long id);
 	public List<Phone> findAll();
 	public Phone findById(Long id);
-	public Phone findByDevice(String device) throws Exception;
+	public Phone findByDevice(String device);
 	
 }
