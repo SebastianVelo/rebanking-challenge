@@ -19,9 +19,12 @@ public class Post implements Serializable {
 	private String title;
 	private String description;
 	private float price;
-	private Phone phone;
+	private Long phone;
 	
-	public Post(String title, String description, float price, Phone phone) {
+	public Post() {
+		
+	}
+	public Post(String title, String description, float price, Long phone) {
 		super();
 		this.title = title;
 		this.description = description;
@@ -61,11 +64,11 @@ public class Post implements Serializable {
 		this.price = price;
 	}
 
-	public Phone getPhone() {
+	public Long getPhone() {
 		return phone;
 	}
 
-	public void setPhone(Phone phone) {
+	public void setPhone(Long phone) {
 		this.phone = phone;
 	}
 

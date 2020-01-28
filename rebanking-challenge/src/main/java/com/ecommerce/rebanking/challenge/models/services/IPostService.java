@@ -3,7 +3,6 @@ package com.ecommerce.rebanking.challenge.models.services;
 import java.util.List;
 import java.util.Optional;
 
-import com.ecommerce.rebanking.challenge.models.entity.Phone;
 import com.ecommerce.rebanking.challenge.models.entity.Post;
 
 public interface IPostService {
@@ -17,6 +16,6 @@ public interface IPostService {
 	public Post findById(Long id);
 
 	public Post update(Long id, Optional<String> title, Optional<String> description, Optional<Float> price,
-			Phone phone);
+			Long phone);
 
 }

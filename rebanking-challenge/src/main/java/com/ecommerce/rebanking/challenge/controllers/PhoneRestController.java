@@ -18,8 +18,7 @@ public class PhoneRestController {
 
 	@Autowired
 	private IPhoneService phoneService;
-	
-	
+		
 	@GetMapping("/phones")
 	public ResponseEntity<List<Phone>> index() {
 		return ResponseEntity.ok(phoneService.findAll());

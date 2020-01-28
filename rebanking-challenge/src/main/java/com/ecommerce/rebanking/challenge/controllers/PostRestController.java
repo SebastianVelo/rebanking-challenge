@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,21 +37,26 @@ public class PostRestController {
 	public ResponseEntity<Post> save(@PathVariable String title, @PathVariable String description,
 			@PathVariable float price, @PathVariable String device) {
 		Phone phone = phoneService.findByDevice(device);
-		return ResponseEntity.ok(postService.save(new Post(title, description, price, phone)));
+		Long idPhone = -1L;
+		if(phone != null)
+			idPhone = phone.getId();
+		return ResponseEntity.ok(postService.save(new Post(title, description, price, idPhone)));
 	}
 
 	@PutMapping("/posts/{id}/{title}/{description}/{price}/{device}")
 	public ResponseEntity<Post> update(@PathVariable Long id, @PathVariable Optional<String> title,
 			@PathVariable Optional<String> description, @PathVariable Optional<Float> price,
 			@PathVariable Optional<String> device) throws Exception {
-		Phone phone = null;
+		Long idPhone = null;
 		if(device.isPresent()) {
-			phone = phoneService.findByDevice(device.get());
+			Phone phone = phoneService.findByDevice(device.get());
+			if(phone != null)
+				idPhone = phone.getId();
 		}
-		return ResponseEntity.ok(postService.update(id, title, description, price, phone));
+		return ResponseEntity.ok(postService.update(id, title, description, price, idPhone));
 	}
 
-	@PostMapping("/posts/{id}")
+	@DeleteMapping("/posts/{id}")
 	public void delete(@PathVariable Long id) throws Exception {
 		postService.delete(id);
 	}

@@ -3,13 +3,13 @@ package com.ecommerce.rebanking.challenge.models.services;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.logging.log4j.core.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ecommerce.rebanking.challenge.models.dao.IPostDao;
-import com.ecommerce.rebanking.challenge.models.entity.Phone;
 import com.ecommerce.rebanking.challenge.models.entity.Post;
 
 @Service
@@ -17,7 +17,7 @@ public class PostServiceImpl implements IPostService {
 
 	@Autowired
 	private IPostDao postDao;
-	private Logger logger;
+	private Logger logger = LogManager.getLogger(PostServiceImpl.class);;
 
 	@Override
 	@Transactional
@@ -34,7 +34,7 @@ public class PostServiceImpl implements IPostService {
 	@Override
 	@Transactional
 	public Post update(Long id, Optional<String> title, Optional<String> description, Optional<Float> price,
-			Phone phone) {
+			Long phone) {
 		Post post = findById(id);
 		if(title.isPresent()) {
 			post.setTitle(title.get());
@@ -59,7 +59,7 @@ public class PostServiceImpl implements IPostService {
 	@Transactional(readOnly = true)
 	public List<Post> findAll() {
 		List<Post> posts = postDao.findAll();
-		logger.info("Response PostDao findAll" + posts);
+		logger.info("Response PostDao findAll" + (posts == null ? "Not found" : posts));
 		return posts;
 	}
 
@@ -67,7 +67,7 @@ public class PostServiceImpl implements IPostService {
 	@Transactional(readOnly = true)
 	public Post findById(Long id) {
 		Post post = postDao.findById(id).get();
-		logger.info("Response PostDao findById" + post);
+		logger.info("Response PostDao findById" + (post == null ? "Not found" : post));
 		return post;
 	}
 
